@@ -1,0 +1,3 @@
+
+class SimlCreateException(Exception):
+    pass
