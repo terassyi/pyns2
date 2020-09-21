@@ -1,5 +1,6 @@
 from siml.error import SimlCreateException
 from netns.netns import NetNs
+from pyroute2 import netns
 
 class Siml():
     def __init__(self, config):
@@ -16,3 +17,11 @@ class Siml():
             ns = NetNs(k, v)
             netns_list.append(ns)
         self.netns = netns_list
+
+    def create(self):
+        for ns in self.netns:
+            ns.create()
+
+    def list(self):
+        ns_list = netns.listnetns()
+        print(ns_list)

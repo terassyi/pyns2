@@ -8,6 +8,7 @@ example-network:
         - host2-veth1:
             type: "veth"
             address: "192.168.0.2/24"
+            peer: "host1-veth1"
         - host2-veth2:
             type: "veth"
             address: "192.168.1.3/24"
