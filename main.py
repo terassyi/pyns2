@@ -5,6 +5,8 @@ def main():
     s.create()
     s.list()
 
+    s.netns[0].interfaces[0].delete()
+
 
 if __name__ == "__main__":
     main()
