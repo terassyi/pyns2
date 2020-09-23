@@ -2,6 +2,7 @@ import netaddr
 from enum import Enum
 from siml.error import SimlCreateException
 from pyroute2 import IPRoute
+from pyroute2 import IPDB
 from pyroute2 import NetNS
 from pyroute2 import netns
 import logging
@@ -14,7 +15,7 @@ class NetNs():
         interfaces = []
         for iface in ifaces:
             name = list(iface.keys())[0]
-            i = Interface(name, address=iface[name]["address"], typ=iface[name]["type"])
+            i = Interface(name, address=iface[name]["address"], typ=iface[name]["type"], ns_name=self.name)
             interfaces.append(i)
         self.interfaces = interfaces
 
@@ -24,7 +25,7 @@ class NetNs():
         print("[info] Created Network Namespace %s" % self.name)
         for iface in self.interfaces:
             iface.create()
-            self.set_interface(iface)
+            # self.set_interface(iface)
     
     def remove(self):
         netns.remove(self.name)
@@ -35,48 +36,36 @@ class NetNs():
         ipr.link('set', index=index, net_ns_fd=self.name)
 
 class Interface():
-    def __init__(self, name: str, address: str = None, typ: str = None):
+    def __init__(self, name: str, address: str = None, typ: str = None, ns_name: str = None):
         self.type = interface_type_from_string(typ)
         self.name = name
         self.ip = netaddr.IPNetwork(address)
+        self.ns_name = ns_name
 
     def create(self):
-        ipr = IPRoute()
-        if len(ipr.link_lookup(ifname=self.name)) != 0:
-            print("[info] Already created name=%s" % self.name)
-            return
-        ipr.link('add', ifname=self.name, kind=self.type.to_string())
-
+        ns = NetNS(self.ns_name)
+        ipdb = IPDB(nl=ns)
+        ipdb.create(kind=str(self.type), ifname=self.name).commit()
         self.set_addr()
-        print("[info] Created Network Interface name=%s address=%s " % (self.name, str(self.ip)))
+        print("[info] Created Network Interface name=%s address=%s in netns=%s" % (self.name, str(self.ip), self.ns_name))
 
     def delete(self):
-        ipr = IPRoute()
-        if len(ipr.link_lookup(ifname=self.name)) == 0:
-            return
-        ipr.link('del', ifname=self.name)
+        ipdb = IPDB(nl=NetNS(self.ns_name))
+        with ipdb.interfaces[self.name] as iface:
+            iface.detach().commit()
 
     def set_addr(self, addr: str = None):
-        ipr = IPRoute()
-        prefix = 0
-        if addr is None:
-            addr = str(self.ip.ip)
-            prefix = self.ip.prefixlen
-        else:
-            ip = netaddr.ip_network(addr)
-            addr = str(ip.ip)
-            prefix = ip.prefixlen
-
-        index = ipr.link_lookup(ifname=self.name)[0]
-        ipr.addr('add', index=index, address=addr, prefixlen=prefix)
+        ipdb = IPDB(nl=NetNS(self.ns_name))
+        with ipdb.interfaces[self.name] as iface:
+            iface.add_ip(str(self.ip))
 class InterfaceType(Enum):
     veth = 0
 
-    def to_string(self):
-        if self is InterfaceType.veth:
+    def __str__(self):
+        if self == InterfaceType.veth:
             return 'veth'
         else:
-            ''
+            return ''
 
 def interface_type_from_string(typ: str):
     if typ == "veth":

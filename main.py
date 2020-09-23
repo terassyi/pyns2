@@ -1,12 +1,26 @@
+# from parser.parser import parse
+import fire
 from parser.parser import parse
 
-def main():
-    s = parse("./examples/example.yml")
-    s.create()
-    s.list()
+class NetNsSiml(object):
 
-    s.netns[0].interfaces[0].delete()
+    def create(self, config: str = None):
+        print("create command ", config)
+        siml = parse(config)
+        print(siml)
+        siml.create()
+
+    def init(self, config: str = None):
+        print("init command")
+
+    def delete(self, config: str = None):
+        print("delete command")
+        siml = parse(config)
+        siml.delete()
+    
+    def list(self):
+        print("list command")
 
 
 if __name__ == "__main__":
-    main()
+    fire.Fire(NetNsSiml)

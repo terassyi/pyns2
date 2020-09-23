@@ -3,7 +3,7 @@ from siml.siml import Siml
 
 def parse(path: str):
     with open(path, 'r') as yml:
-        config = yaml.load(yml)
+        config = yaml.load(yml, Loader=yaml.SafeLoader)
         s = Siml(config)
         return s
 
