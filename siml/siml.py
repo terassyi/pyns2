@@ -23,6 +23,20 @@ class Siml():
         for ns in self.netns:
             ns.create()
 
+    def run(self):
+        for ns in self.netns:
+            ns.run()
+
+    def up(self):
+        for ns in self.netns:
+            for iface in ns.interfaces:
+                iface.up()
+
+    def down(self):
+        for ns in self.netns:
+            for iface in ns.interfaces:
+                iface.down()
+
     def delete(self):
         ns_list = netns.listnetns()
         for ns in self.netns:
@@ -32,4 +46,9 @@ class Siml():
 
     def list(self):
         ns_list = netns.listnetns()
-        print(ns_list)
+        for ns in ns_list:
+            print(ns)
+
+    def status(self):
+
+        pass
