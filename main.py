@@ -1,7 +1,7 @@
 # from parser.parser import parse
 import fire
 from parser.parser import parse
-from netns.netns import exec_command
+from netns.exec import exec_command
 
 class NetNsSiml(object):
 
@@ -10,6 +10,10 @@ class NetNsSiml(object):
         siml = parse(config)
         siml.create()
 
+    def set(self, config: str = None):
+        siml = parse(config)
+        siml.set_netns()
+        
     def init(self, config: str = None):
         print("init command")
 
@@ -29,7 +33,7 @@ class NetNsSiml(object):
     def down(self, config: str = None):
         siml = parse(config)
         siml.down()
-        
+
     def exec(self, ns: str, command= 'bash'):
         exec_command(ns, command)
     

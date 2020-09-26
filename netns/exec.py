@@ -34,3 +34,13 @@ def start_process(ns, command):
 
     # restore tty settings back
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
+
+def exec_command(ns: str, command):
+    if type(command) is not list:
+        command  = [command]
+    # nsprocess = NSPopen(ns, command, encoding='UTF-8', stdout=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=True)
+    # nsprocess.wait()
+    # output = nsprocess.stdout.read()
+    # print(output)
+    # nsprocess.stdout.close()
+    start_process(ns, command)
