@@ -1,6 +1,7 @@
 from siml.error import SimlCreateException
 from netns.netns import NetNs
 from netns.interface import InterfaceType, interface_type_from_string
+from netns.route import Route
 from netns.veth import Veth
 from netns.vlan import Vlan
 from netns.bridge import Bridge
@@ -19,10 +20,12 @@ class Siml():
         netns_list = []
         interface_list = []
         interface_name_list = []
-        for ns_name, ifaces in config[self.name].items():
-            for iface in ifaces:
+        
+        for ns_name, resources in config[self.name].items():
+            for iface in resources['interfaces']:
                 interface_name_list.append(list(iface.keys())[0])
-        for ns_name, ifaces in config[self.name].items():
+        for ns_name, resources in config[self.name].items():
+            ifaces = resources['interfaces']
             ns = NetNs(ns_name, ifaces)
             netns_list.append(ns)
             for iface in ifaces:
@@ -41,16 +44,21 @@ class Siml():
                     interface_list.append(Vlan(ifname=name, address=iface[name]["address"], ns_name=ns_name))
                 elif typ == InterfaceType.bridge:
                     interface_list.append(Bridge(ifname=name, address=iface[name]["address"], ns_name=ns_name))
+
+            routes_list = []
+            routes = resources['routes']
+            for route in routes:
+                routes_list.append(Route(gateway=route['route']['gateway'], dest=route['route']['dest']))
+            ns.routes = routes_listF
         
         self.netns = netns_list
         self.interfaces = interface_list
-
+        self.routes = routes_list
 
     def create(self):
         for ns in self.netns:
             ns.create()
         for iface in self.interfaces:
-            print("reach here")
             iface.create()
 
     def set_netns(self):
@@ -64,13 +72,17 @@ class Siml():
             iface.set_addr(in_ns=True)
 
     def run(self):
-        for ns in self.netns:
-            ns.run()
+        self.create()
+        self.set_netns()
+        self.set_addr()
+        self.up()
 
     def up(self):
         for ns in self.netns:
             for iface in ns.interfaces:
                 iface.up()
+            for route in ns.routes:
+                route.set(ns.name)
 
     def down(self):
         for ns in self.netns:
