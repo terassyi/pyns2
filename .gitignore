@@ -2,3 +2,4 @@ __pycache__
 netns_siml.egg-info
 docker-compose.yml
 Dockerfile
+.vagrant
