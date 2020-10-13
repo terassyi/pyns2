@@ -28,6 +28,9 @@ class Interface():
         ipdb.create(kind=str(self.type), ifname=self.name, peer=self.peer_name).commit()
 
     def set_netns(self):
+        # if not in netns
+        if self.ns_name is None:
+            return
         ipdb = IPDB()
         with ipdb.interfaces[self.name] as iface:
             iface.net_ns_fd = self.ns_name
@@ -39,7 +42,9 @@ class Interface():
             iface.detach().commit()
 
     def up(self):
-        ipdb = IPDB(nl=NetNS(self.ns_name))
+        ipdb = IPDB()
+        if self.ns_name is not None:
+            ipdb = IPDB(nl=NetNS(self.ns_name))
         with ipdb.interfaces[self.name] as iface:
             iface.up()
             self.status = InterfaceStatus.up
@@ -51,9 +56,11 @@ class Interface():
             iface.down()
             print("[info] Network Interface(%s) is Down" % self.name)
 
-    def set_addr(self, in_ns: bool):
+    def set_addr(self):
+        if self.ip is None:
+            return
         ipdb = IPDB()
-        if in_ns:
+        if self.ns_name is not None:
             ipdb = IPDB(nl=NetNS(self.ns_name))
         with ipdb.interfaces[self.name] as iface:
             iface.add_ip(str(self.ip))

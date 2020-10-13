@@ -1,30 +1,40 @@
 example-network:
-    host1:
-        interfaces:
-            - host1-veth1:
+    host:
+        ifaces:
+            host-veth:
                 type: "veth"
-                address: "192.168.0.1/24"
-                peer: "host2-veth1"
-        routes:
-            - route:
-                dest: "default"
-                gateway: "192.168.0.1"
-            - route:
-                dest: "192.168.3.0/24"
-                gateway: "192.168.0.100"
+                address: "192.168.0.5/24"
 
+    netns:
+        host1:
+            ifaces:
+                host1-veth1:
+                    type: "veth"
+                    address: "192.168.0.1/24"
+                    peer: "host2-veth1"
+                host1-veth2:
+                    type: "veth"
+                    address: "192.168.1.5/24"
+                    peer: "host2-veth2" 
+            routes:
+                - route:
+                    dest: "default"
+                    gateway: "192.168.0.1"
+                - route:
+                    dest: "192.168.0.100"
+                    gateway: "192.168.0.100"
 
-    host2:
-        interfaces:
-            - host2-veth1:
-                type: "veth"
-                address: "192.168.0.2/24"
-                peer: "host1-veth1"
-            - host2_veth2:
-                type: "veth"
-                address: "192.168.1.3/24"
-
-        routes:
-            - route:
-                dest: "default"
-                gateway: "192.168.0.1"
+        host2:
+            ifaces:
+                host2-veth1:
+                    type: "veth"
+                    address: "192.168.0.2/24"
+                    peer: "host1-veth1"
+                host2-veth2:
+                    type: "veth"
+                    address: "192.168.1.3/24"
+            routes:
+                - route:
+                    dest: "default"
+                    gateway: "192.168.0.1"
+            

@@ -17,9 +17,8 @@ class NetNs():
     def __init__(self, name: str, ifaces):
         self.name = name
         interfaces = []
-        for iface in ifaces:
-            name = list(iface.keys())[0]
-            i = Interface(name, address=iface[name]["address"], typ=iface[name]["type"], ns_name=self.name)
+        for ifname, iface in ifaces.items():
+            i = Interface(ifname, address=iface["address"], typ=iface["type"], ns_name=self.name)
             interfaces.append(i)
         self.interfaces = interfaces
 

@@ -42,7 +42,9 @@ class NetNsSiml(object):
         siml = parse(config)
         siml.list()
 
-    
+    def validate(self, config: str = None):
+        siml = parse(config)
+        siml.show()
 
     def status(self, config: str = None):
         pass

@@ -17,43 +17,44 @@ class Siml():
 
         self.name = list(config.keys())[0]
 
-        netns_list = []
-        interface_list = []
-        interface_name_list = []
-        
-        for ns_name, resources in config[self.name].items():
-            for iface in resources['interfaces']:
-                interface_name_list.append(list(iface.keys())[0])
-        for ns_name, resources in config[self.name].items():
-            ifaces = resources['interfaces']
-            ns = NetNs(ns_name, ifaces)
-            netns_list.append(ns)
-            for iface in ifaces:
-                # switch interface types
-                name = list(iface.keys())[0]
-                typ = interface_type_from_string(iface[name]["type"])
-                if typ == InterfaceType.veth:
-                    if "peer" in iface[name].keys() and not iface[name]["peer"] in interface_name_list:
-                        # peer interface is not existing
-                        raise SimlCreateException
-                    if "peer" in iface[name].keys():
-                        interface_list.append(Veth(ifname=name, address=iface[name]["address"], peer=iface[name]["peer"], ns_name=ns_name))
-                    else:
-                        interface_list.append(Veth(ifname=name, address=iface[name]["address"], ns_name=ns_name))
-                elif typ == InterfaceType.vlan:
-                    interface_list.append(Vlan(ifname=name, address=iface[name]["address"], ns_name=ns_name))
-                elif typ == InterfaceType.bridge:
-                    interface_list.append(Bridge(ifname=name, address=iface[name]["address"], ns_name=ns_name))
+        self.netns = []
+        self.interfaces = []
+        self.interfaces_name = []
+        self.routes = []
 
-            routes_list = []
-            routes = resources['routes']
-            for route in routes:
-                routes_list.append(Route(gateway=route['route']['gateway'], dest=route['route']['dest']))
-            ns.routes = routes_listF
-        
-        self.netns = netns_list
-        self.interfaces = interface_list
-        self.routes = routes_list
+        if "host" in config[self.name].keys():
+            self.load_host(config[self.name]["host"])
+
+        for ns_name, resources in config[self.name]["netns"].items():
+            ifaces = resources['ifaces']
+            # print(ifaces)
+            ns = NetNs(ns_name, ifaces)
+            self.netns.append(ns) 
+            self.load_host(resources, ns_name=ns_name)
+
+    def load_host(self, config, ns_name: str = None):
+        ifaces = config["ifaces"]
+        routes = {}
+        if "routes" in config:
+            routes = config["routes"]
+        for ifname, iface in ifaces.items():
+            typ = interface_type_from_string(iface["type"])
+            if typ == InterfaceType.veth:
+                if "peer" in iface.keys():
+                    self.interfaces.append(Veth(ifname=ifname, address=iface["address"], peer=iface["peer"], ns_name=ns_name))
+                    # self.interfaces.append(Veth(ifname=iface["peer"], address=iface["address"]))
+                else:
+                    self.interfaces.append(Veth(ifname=ifname, address=iface["address"], ns_name=ns_name))
+                
+            elif typ == InterfaceType.bridge:
+                self.interfaces.append(Bridge(ifname=ifname, iflist=iface["ifaces"], ns_name=ns_name))
+                # for v in iface["ifaces"]:
+                #     self.interfaces.append(Veth(ifname=v, ns_name=ns_name))
+            else:
+                pass
+
+        for route in routes:
+            self.routes.append(Route(gateway=route['route']['gateway'], dest=route['route']['dest'], ns_name=ns_name))
 
     def create(self):
         for ns in self.netns:
@@ -65,24 +66,29 @@ class Siml():
         for iface in self.interfaces:
             iface.set_netns()
         
-        self.set_addr()
 
     def set_addr(self):
         for iface in self.interfaces:
-            iface.set_addr(in_ns=True)
+            iface.set_addr()
+
+    def start(self):
+        self.set_netns()
+        self.set_bridge()
+        self.set_addr()
+        self.up()
 
     def run(self):
         self.create()
         self.set_netns()
+        self.set_bridge()
         self.set_addr()
         self.up()
 
     def up(self):
-        for ns in self.netns:
-            for iface in ns.interfaces:
-                iface.up()
-            for route in ns.routes:
-                route.set(ns.name)
+        for iface in self.interfaces:
+            iface.up()
+        for route in self.routes:
+            route.set()
 
     def down(self):
         for ns in self.netns:
@@ -104,3 +110,17 @@ class Siml():
     def status(self):
 
         pass
+
+    def show(self):
+        print("[Network Name] ", self.name)
+        for ns in self.netns:
+            print("[NETNS] ", ns.name)
+            for iface in ns.interfaces:
+                print("[INTERFACE] ", iface.name)
+
+    def set_bridge(self):
+        for iface in self.interfaces:
+            if iface.type == InterfaceType.bridge:
+                iface.set_if()
+
+
