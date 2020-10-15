@@ -6,7 +6,7 @@ from netns.veth import Veth
 from netns.vlan import Vlan
 from netns.bridge import Bridge
 from pyroute2 import netns
-from pyroute2 import NetNS
+from pyroute2 import NetNS, IPDB
 
 class Siml():
     def __init__(self, config):
@@ -96,10 +96,20 @@ class Siml():
                 iface.down()
 
     def delete(self):
+        # delete resources in host namespaces
+        ipdb = IPDB()
+        for iface in self.interfaces:
+            if iface.ns_name is not None:
+                continue
+            print("[INFO] Delete interface %s in host namespace" % iface.name)
+            with ipdb.interfaces[iface.name] as i:
+                i.remove()
+
         ns_list = netns.listnetns()
         for ns in self.netns:
             if not ns.name in ns_list:
                 continue
+            print("[INFO] Delete netns %s" % ns.name)
             ns.remove()
 
     def list(self):
