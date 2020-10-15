@@ -4,9 +4,8 @@ example-network-bridge:
             br0:
                 type: "bridge"
                 ifaces:
-                    # - "veth1-br"
+                    - "veth1-br"
                     - "veth2-br"
-                    - "veth3-br"
 
     netns:
         host1:
@@ -14,11 +13,11 @@ example-network-bridge:
                 host1-veth1:
                     type: "veth"
                     address: "10.0.0.1/24"
-                    peer: "veth2-br"
+                    peer: "veth1-br"
 
         host2:
             ifaces:
                 host2-veth1:
                     type: "veth"
                     address: "10.0.0.2/24"
-                    peer: "veth3-br"
+                    peer: "veth2-br"
