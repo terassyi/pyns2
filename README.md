@@ -1,6 +1,5 @@
-# netns-siml
-netns-siml is network simulator with linux network namespace create virtual network by yaml format config file.
-
+# pyns2
+pyns2(renamed from netns-siml) is network simulator with linux network namespace create virtual network by yaml format config file.
 ## support
 Now `veth` and `bridge` type interface is supported.
 
