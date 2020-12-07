@@ -3,12 +3,14 @@ import netaddr
 from pyroute2 import IPDB, NetNS
 
 class Bridge(Interface):
-    def __init__(self, ifname: str, iflist, ns_name: str = None):
+    def __init__(self, ifname: str, iflist, addr: str = None, ns_name: str = None):
         self.name = ifname
         self.type = InterfaceType.bridge
         self.iflist = iflist
         self.ns_name = ns_name
         self.ip = None
+        if addr is not None:
+            self.ip = netaddr.IPNetwork(addr)
         self.status = InterfaceStatus.not_created
 
     def create(self):

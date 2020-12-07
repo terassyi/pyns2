@@ -5,6 +5,7 @@ from netns.route import Route
 from netns.veth import Veth
 from netns.vlan import Vlan
 from netns.bridge import Bridge
+from netns.nat import NAT
 from pyroute2 import netns
 from pyroute2 import NetNS, IPDB
 
@@ -21,6 +22,7 @@ class Siml():
         self.interfaces = []
         self.interfaces_name = []
         self.routes = []
+        self.nat_list = []
 
         if "host" in config[self.name].keys():
             self.load_host(config[self.name]["host"])
@@ -45,9 +47,8 @@ class Siml():
                     # self.interfaces.append(Veth(ifname=iface["peer"], address=iface["address"]))
                 else:
                     self.interfaces.append(Veth(ifname=ifname, address=iface["address"], ns_name=ns_name))
-                
             elif typ == InterfaceType.bridge:
-                self.interfaces.append(Bridge(ifname=ifname, iflist=iface["ifaces"], ns_name=ns_name))
+                self.interfaces.append(Bridge(ifname=ifname, iflist=iface["ifaces"], addr=iface["address"], ns_name=ns_name))
                 # for v in iface["ifaces"]:
                 #     self.interfaces.append(Veth(ifname=v, ns_name=ns_name))
             else:
@@ -56,11 +57,21 @@ class Siml():
         for route in routes:
             self.routes.append(Route(gateway=route['route']['gateway'], dest=route['route']['dest'], ns_name=ns_name))
 
+        # nat configure
+        if "nat" in config:
+            nat_config = config["nat"]
+            nat = NAT(nat_config, ns_name=ns_name)
+            self.nat_list.append(nat)
+            # nat.create()
+
+
     def create(self):
         for ns in self.netns:
             ns.create()
         for iface in self.interfaces:
             iface.create()
+        for nat in self.nat_list:
+            nat.create()
 
     def set_netns(self):
         for iface in self.interfaces:
@@ -105,6 +116,9 @@ class Siml():
             with ipdb.interfaces[iface.name] as i:
                 i.remove()
 
+        for nat in self.nat_list:
+            nat.delete()
+
         ns_list = netns.listnetns()
         for ns in self.netns:
             if not ns.name in ns_list:
@@ -133,4 +147,6 @@ class Siml():
             if iface.type == InterfaceType.bridge:
                 iface.set_if()
 
+    # def output_state(self, path):
+        
 

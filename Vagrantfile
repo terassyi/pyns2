@@ -14,6 +14,8 @@ Vagrant.configure("2") do |config|
     vb.cpus = 2
     vb.memory = 1024 
   end
+  config.vm.provision "file", source: "./requirements.txt", destination: "/tmp/requirements.txt"
+  config.vm.provision :shell, :privileged => true, :path => "setup.sh"
   config.vm.synced_folder "./", "/home/vagrant/work"
 
   # Disable automatic box update checking. If you disable this, then

@@ -2,5 +2,6 @@ fire==0.3.1
 netaddr==0.8.0
 pyroute2==0.5.14
 PyYAML==5.3.1
+python-iptables==1.0.0
 six==1.15.0
 termcolor==1.1.0
