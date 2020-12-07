@@ -15,6 +15,8 @@ class Bridge(Interface):
 
     def create(self):
         ipdb = IPDB()
+        if self.ns_name is not None:
+            ipdb = IPDB(nl=NetNS(self.ns_name))
         if self.name in ipdb.interfaces.keys():
             print("[info] %s is already created" % self.name)
             return
@@ -24,9 +26,19 @@ class Bridge(Interface):
         self.status = InterfaceStatus.down
 
     def set_if(self):
-        ipdb = IPDB()
         if self.ns_name is not None:
-            ipdb = IPDB(ns=NetNS(self.ns_name))
+            ipdb = IPDB()
+            for slv_name in self.iflist:
+                with ipdb.interfaces[slv_name] as slv:
+                    slv.net_ns_fd = self.ns_name
+            ipdb = IPDB(nl=NetNS(self.ns_name))
+            with ipdb.interfaces[self.name] as br:
+                for slv_name in self.iflist:
+                    with ipdb.interfaces[slv_name] as slv:
+                        br.add_port(slv)
+            return
+
+        ipdb = IPDB()
         with ipdb.interfaces[self.name] as br:
             for i in self.iflist:
                 with ipdb.interfaces[i] as iface:
@@ -35,7 +47,7 @@ class Bridge(Interface):
     def up(self):
         ipdb = IPDB()
         if self.ns_name is not None:
-            ipdb = IPDB(ns=NetNS(self.ns_name))
+            ipdb = IPDB(nl=NetNS(self.ns_name))
         with ipdb.interfaces[self.name] as br:
             br.up()
             self.status = InterfaceStatus.up

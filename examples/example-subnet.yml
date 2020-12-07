@@ -1,0 +1,88 @@
+example-network-subnet:
+  host:
+    ifaces:
+      veth0:
+        type: "veth"
+        address: "10.0.0.3/24"
+        peer: veth0-br0
+      
+      br0:
+        type: "bridge"
+        address: "10.0.0.2/24"
+        ifaces:
+          - rt-br0
+          - veth0-br0
+          - veth1-br0
+    routes:
+      - route:
+          gateway: "10.0.0.1"
+          dest: "10.0.1.0/24"
+
+  netns:
+    
+    host1:
+      ifaces:
+        veth1:
+          type: "veth"
+          address: "10.0.0.4/24"
+          peer: veth1-br0
+      routes:
+        - route:
+            gateway: "10.0.0.1"
+            dest: "10.0.1.0/24"
+      
+    router:
+      ifaces:
+        router0:
+          type: "veth"
+          address: "10.0.0.1/24"
+          peer: rt-br0
+        
+        router1:
+          type: "veth"
+          address: "10.0.1.1/24"
+          peer: rt-br1
+      routes:
+        - route:
+            gateway: "10.0.0.1"
+            dest: "10.0.1.0/24"
+        - route:
+            gateway: "10.0.1.1"
+            dest: "10.0.0.0/24"
+      
+      
+    host2:
+      ifaces:
+        br1:
+          type: "bridge"
+          address: "10.0.1.2/24"
+          ifaces:
+            - rt-br1
+            - veth2-br1
+            - veth3-br1
+      routes:
+        - route:
+            gateway: "10.0.1.1"
+            dest: "10.0.0.0/24"
+
+    host3:
+      ifaces:
+        veth2:
+          type: "veth"
+          address: "10.0.1.3/24"
+          peer: veth2-br1
+      routes:
+        - route:
+            gateway: "10.0.1.1"
+            dest: "10.0.0.0/24"
+
+    host4:
+      ifaces:
+        veth3:
+          type: "veth"
+          address: "10.0.1.4/24"
+          peer: veth3-br1
+      routes:
+        - route:
+            gateway: "10.0.1.1"
+            dest: "10.0.0.0/24"

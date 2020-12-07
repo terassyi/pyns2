@@ -48,7 +48,10 @@ class Siml():
                 else:
                     self.interfaces.append(Veth(ifname=ifname, address=iface["address"], ns_name=ns_name))
             elif typ == InterfaceType.bridge:
-                self.interfaces.append(Bridge(ifname=ifname, iflist=iface["ifaces"], addr=iface["address"], ns_name=ns_name))
+                if "address" in iface.keys():
+                    self.interfaces.append(Bridge(ifname=ifname, iflist=iface["ifaces"], addr=iface["address"], ns_name=ns_name))
+                else:
+                    self.interfaces.append(Bridge(ifname=ifname, iflist=iface["ifaces"], ns_name=ns_name))
                 # for v in iface["ifaces"]:
                 #     self.interfaces.append(Veth(ifname=v, ns_name=ns_name))
             else:

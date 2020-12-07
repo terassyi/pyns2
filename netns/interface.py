@@ -32,6 +32,10 @@ class Interface():
         if self.ns_name is None:
             return
         ipdb = IPDB()
+        try:
+            ipdb.interfaces[self.name]
+        except KeyError:
+            return 
         with ipdb.interfaces[self.name] as iface:
             iface.net_ns_fd = self.ns_name
             print("[info] %s is set netns=%s" % (self.name, self.ns_name))

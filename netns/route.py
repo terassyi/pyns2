@@ -7,6 +7,12 @@ class Route(object):
         self.ns_name = ns_name
 
     def set(self):
-        ipdb = IPDB(nl=NetNS(self.ns_name))
+        ipdb = IPDB()
+        if self.ns_name is not None:
+            ipdb = IPDB(nl=NetNS(self.ns_name))
         print("[info] dest=%s gateway=%s in ns=%s" % (self.dest, self.gateway, self.ns_name))
-        ipdb.routes.add(dst=self.dest, gateway=self.gateway).commit()
+        try:
+            ipdb.routes[self.dest]
+            return
+        except:
+            ipdb.routes.add(dst=self.dest, gateway=self.gateway).commit()
