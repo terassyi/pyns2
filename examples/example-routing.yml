@@ -1,0 +1,65 @@
+example-network-subnet:
+  host:
+    ifaces:
+      veth0:
+        type: "veth"
+        address: "192.168.2.254/24"
+        peer: "rt0-veth0"
+      
+    routes:
+      - route:
+          gateway: "192.168.2.1"
+          dest: "192.168.0.0/24"
+      - route:
+          gateway: "192.168.2.1"
+          dest: "192.168.1.0/24"
+
+  netns:
+    rt0:
+      ifaces:
+        rt0-veth0:
+          type: "veth"
+          address: "192.168.2.1/24"
+          peer: "veth0"
+        
+        rt0-veth1:
+          type: "veth"
+          address: "192.168.1.254/24"
+          peer: "rt1-veth0"
+      
+      routes:
+        - route:
+            gateway: "192.168.2.254"
+            dest: "default"
+        - route:
+            gateway: "192.168.1.1"
+            dest: "192.168.0.0/24"
+            
+    rt1:
+      ifaces:
+        rt1-veth0:
+          type: "veth"
+          address: "192.168.1.1/24"
+          peer: "rt0-veth1"
+
+        rt1-veth1:
+          type: "veth"
+          address: "192.168.0.254/24"
+          peer: "veth1"
+
+      routes:
+        - route:
+            gateway: "192.168.1.254"
+            dest: "default"
+
+    host1:
+      ifaces:
+        veth1:
+          type: "veth"
+          address: "192.168.0.1/24"
+          peer: "rt1-veth1"
+      
+      routes:
+        - route:
+            gateway: "192.168.0.254"
+            dest: "default"
