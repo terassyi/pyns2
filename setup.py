@@ -5,14 +5,14 @@ with open('requirements.txt') as requirements_file:
 
 setup(
     name = "pyns2",
-    version = "0.0.1",
+    version = "0.0.3",
     description = "network simulation tool by using linux network namespace",
     author = "terassyi",
-    packages = find_packages(),
+    packages = find_packages('pyns2'),
     install_requires = install_requirements,
     entry_points = {
         "console_scripts": [
-            "test = test:test",
+            "pyns2 = main.main"
         ]
     }
 )

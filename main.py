@@ -2,6 +2,7 @@
 import fire
 from parser.parser import parse
 from netns.exec import exec_command
+from siml.util import register_netns_id
 
 class NetNsSiml(object):
 
@@ -48,6 +49,9 @@ class NetNsSiml(object):
 
     def status(self, config: str = None):
         pass
+
+    def register_netns_id(self, ns_name):
+        register_netns_id(ns_name)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
 from siml.error import SimlCreateException
+from siml.util import *
 from netns.netns import NetNs
 from netns.interface import InterfaceType, interface_type_from_string
 from netns.route import Route
@@ -69,6 +70,7 @@ class Siml():
 
 
     def create(self):
+        mkdir_tmp()
         for ns in self.netns:
             ns.create()
         for iface in self.interfaces:

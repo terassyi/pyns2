@@ -1,6 +1,9 @@
 import netaddr
+import os
+import time
 from enum import Enum
 from siml.error import SimlCreateException
+from siml.util import get_netns_id
 from netns.exec import start_process
 from netns.interface import Interface
 from pyroute2 import IPRoute
@@ -16,6 +19,7 @@ log = logging.getLogger(__name__)
 class NetNs():
     def __init__(self, name: str, ifaces):
         self.name = name
+        self.netns_id = 0
         interfaces = []
         for ifname, iface in ifaces.items():
             i = Interface(ifname, address=iface["address"], typ=iface["type"], ns_name=self.name)
@@ -26,7 +30,8 @@ class NetNs():
         self.ns = NetNS(self.name)
         # log.info("Created Network Namespace %s" % self.name)
         print("[info] Created Network Namespace %s" % self.name)
-
+        self.register_netns_id()
+        self.netns_id = int(get_netns_id(self.name))
         # up loopback interface
         ipdb = IPDB(nl=self.ns)
         with ipdb.interfaces["lo"] as lo:
@@ -55,3 +60,15 @@ class NetNs():
             if iface.name == ifname:
                 return True
         return False
+
+
+    def register_netns_id(self):
+        # command = ['/proc/self/exe', os.Args[0], 'register_netns_id', self.name]
+        command = ['python3', 'main.py', 'register_netns_id', self.name]
+        # command = 'python3 ./main.py register_netns_id ' + self.name
+        # command = ['/usr/bin/python3', '-V']
+        p = NSPopen(self.name, command,
+            preexec_fn=os.setsid,
+            universal_newlines=True)
+        time.sleep(0.1)
+        p.release()
