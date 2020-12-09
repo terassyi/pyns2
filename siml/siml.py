@@ -153,3 +153,12 @@ class Siml():
     # def output_state(self, path):
         
 
+def enable_ipv4_forward():
+    ip_forward_path = "/proc/sys/net/ipv4/ip_forward"
+    with open(ip_forward_path, "w") as f:
+        f.write('1')
+
+def disable_ipv4_forward():
+    ip_forward_path = "/proc/sys/net/ipv4/ip_forward"
+    with open(ip_forward_path, "w") as f:
+        f.write('0')
