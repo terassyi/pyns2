@@ -3,17 +3,17 @@ example-network-container:
         ifaces:
             br0:
                 type: "bridge"
-                address: "172.31.0.1/24"
+                address: "192.168.50.2/24"
                 ifaces:
-                    - "veth1-br"
-                    - "veth0-br"
-            
-            host-veth0:
+                    - "host1-veth1-br"
+                    - "host2-veth1-br"
+                    - "host-veth1-br"
+            host-veth1:
                 type: "veth"
-                address: "172.31.0.2/24"
-                peer: "veth0-br"
+                address: "192.168.50.1/24"
+                peer: "host-veth1-br"
         nat:
-          src: "172.31.0.0/24"
+          src: "192.168.50.0/24"
           out_iface: "eth0"
 
     netns:
@@ -21,9 +21,20 @@ example-network-container:
             ifaces:
                 host1-veth1:
                     type: "veth"
-                    address: "172.31.0.100/24"
-                    peer: "veth1-br"
+                    address: "192.168.50.100/24"
+                    peer: "host1-veth1-br"
             routes:
               - route:
-                    gateway: "172.31.0.1"
+                    gateway: "192.168.50.1"
+                    dest: "default"
+
+        host2:
+            ifaces:
+                host2-veth1:
+                    type: "veth"
+                    address: "192.168.50.101/24"
+                    peer: "host2-veth1-br"
+            routes:
+                - route:
+                    gateway: "192.168.50.1"
                     dest: "default"
