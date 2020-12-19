@@ -1,4 +1,6 @@
 __pycache__
+.idea
+venv
 pyns2.egg-info
 docker-compose.yml
 Dockerfile
