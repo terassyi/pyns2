@@ -10,6 +10,9 @@ from netns.nat import NAT
 from pyroute2 import netns
 from pyroute2 import NetNS, IPDB
 
+from siml.util import is_host_namespace
+
+
 class Siml():
     def __init__(self, config):
         if len(list(config.keys())) == 0:
@@ -32,8 +35,11 @@ class Siml():
             ifaces = resources['ifaces']
             # print(ifaces)
             ns = NetNs(ns_name, ifaces)
-            self.netns.append(ns) 
+            self.netns.append(ns)
             self.load_host(resources, ns_name=ns_name)
+
+        # register host network namespace id
+
 
     def load_host(self, config, ns_name: str = None):
         ifaces = config["ifaces"]
@@ -44,13 +50,15 @@ class Siml():
             typ = interface_type_from_string(iface["type"])
             if typ == InterfaceType.veth:
                 if "peer" in iface.keys():
-                    self.interfaces.append(Veth(ifname=ifname, address=iface["address"], peer=iface["peer"], ns_name=ns_name))
+                    self.interfaces.append(
+                        Veth(ifname=ifname, address=iface["address"], peer=iface["peer"], ns_name=ns_name))
                     # self.interfaces.append(Veth(ifname=iface["peer"], address=iface["address"]))
                 else:
                     self.interfaces.append(Veth(ifname=ifname, address=iface["address"], ns_name=ns_name))
             elif typ == InterfaceType.bridge:
                 if "address" in iface.keys():
-                    self.interfaces.append(Bridge(ifname=ifname, iflist=iface["ifaces"], addr=iface["address"], ns_name=ns_name))
+                    self.interfaces.append(
+                        Bridge(ifname=ifname, iflist=iface["ifaces"], addr=iface["address"], ns_name=ns_name))
                 else:
                     self.interfaces.append(Bridge(ifname=ifname, iflist=iface["ifaces"], ns_name=ns_name))
                 # for v in iface["ifaces"]:
@@ -68,9 +76,9 @@ class Siml():
             self.nat_list.append(nat)
             # nat.create()
 
-
     def create(self):
         mkdir_tmp()
+        register_netns_id('host')
         for ns in self.netns:
             ns.create()
         for iface in self.interfaces:
@@ -81,7 +89,6 @@ class Siml():
     def set_netns(self):
         for iface in self.interfaces:
             iface.set_netns()
-        
 
     def set_addr(self):
         for iface in self.interfaces:
@@ -107,11 +114,16 @@ class Siml():
             route.set()
 
     def down(self):
-        for ns in self.netns:
-            for iface in ns.interfaces:
-                iface.down()
+        if not is_host_namespace():
+            print('[error] current netns is not host')
+            return
+        for iface in self.interfaces:
+            iface.down()
 
     def delete(self):
+        if not is_host_namespace():
+            print('[error] current netns is not host')
+            return
         # delete resources in host namespaces
         ipdb = IPDB()
         for iface in self.interfaces:
@@ -130,8 +142,12 @@ class Siml():
                 continue
             print("[INFO] Delete netns %s" % ns.name)
             ns.remove()
+        remove_netns_id()
 
     def list(self):
+        if not is_host_namespace():
+            print('[error] current netns is not host')
+            return
         ns_list = netns.listnetns()
         for ns in ns_list:
             print(ns)
@@ -153,12 +169,13 @@ class Siml():
                 iface.set_if()
 
     # def output_state(self, path):
-        
+
 
 def enable_ipv4_forward():
     ip_forward_path = "/proc/sys/net/ipv4/ip_forward"
     with open(ip_forward_path, "w") as f:
         f.write('1')
+
 
 def disable_ipv4_forward():
     ip_forward_path = "/proc/sys/net/ipv4/ip_forward"

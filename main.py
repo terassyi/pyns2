@@ -2,24 +2,19 @@
 import fire
 from parser.parser import parse
 from netns.exec import exec_command
-from siml.util import register_netns_id
+from siml.util import register_netns_id, get_netns_name
 
 class NetNsSiml(object):
 
     def create(self, config: str = None):
-        print("create command ", config)
         siml = parse(config)
         siml.create()
 
     def set(self, config: str = None):
         siml = parse(config)
         siml.set_netns()
-        
-    def init(self, config: str = None):
-        print("init command")
 
     def delete(self, config: str = None):
-        print("delete command")
         siml = parse(config)
         siml.delete()
     
@@ -37,9 +32,8 @@ class NetNsSiml(object):
 
     def exec(self, ns: str, command= 'bash'):
         exec_command(ns, command)
-    
+
     def list(self, config: str = None):
-        print("list command")
         siml = parse(config)
         siml.list()
 
@@ -47,10 +41,12 @@ class NetNsSiml(object):
         siml = parse(config)
         siml.show()
 
-    def status(self, config: str = None):
-        pass
+    def check_netns(self):
+        name = get_netns_name()
+        print(name)
 
     def register_netns_id(self, ns_name):
+        print('[info] register netns id %s' % ns_name)
         register_netns_id(ns_name)
 
 

@@ -6,6 +6,7 @@ import tty
 import pty
 from pyroute2 import NSPopen
 
+
 def start_process(ns, command):
     # save original tty setting then set it to raw mode
     old_tty = termios.tcgetattr(sys.stdin)
@@ -16,11 +17,11 @@ def start_process(ns, command):
 
     # use os.setsid() make it run in a new process group, or bash job control will not be enabled
     p = NSPopen(ns, command,
-            preexec_fn=os.setsid,
-            stdin=slave_fd,
-            stdout=slave_fd,
-            stderr=slave_fd,
-            universal_newlines=True)
+                preexec_fn=os.setsid,
+                stdin=slave_fd,
+                stdout=slave_fd,
+                stderr=slave_fd,
+                universal_newlines=True)
 
     while p.poll() is None:
         r, w, e = select.select([sys.stdin, master_fd], [], [])
@@ -35,12 +36,8 @@ def start_process(ns, command):
     # restore tty settings back
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
 
+
 def exec_command(ns: str, command):
     if type(command) is not list:
-        command  = [command]
-    # nsprocess = NSPopen(ns, command, encoding='UTF-8', stdout=subprocess.PIPE, stdin=subprocess.PIPE, universal_newlines=True)
-    # nsprocess.wait()
-    # output = nsprocess.stdout.read()
-    # print(output)
-    # nsprocess.stdout.close()
+        command = [command]
     start_process(ns, command)

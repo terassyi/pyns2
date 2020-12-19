@@ -55,7 +55,9 @@ class Interface():
             print("[info] Network Interface(%s) is Up" % self.name)
 
     def down(self):
-        ipdb = IPDB(nl=NetNS(self.ns_name))
+        ipdb = IPDB()
+        if self.ns_name is not None:
+            ipdb = IPDB(nl=NetNS(self.ns_name))
         with ipdb.interfaces[self.name] as iface:
             iface.down()
             print("[info] Network Interface(%s) is Down" % self.name)
