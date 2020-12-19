@@ -23,6 +23,10 @@ example-network:
                 - route:
                     dest: "192.168.0.100"
                     gateway: "192.168.0.100"
+            commands:
+                - command: 
+                    name: "python3 -m http.server 8080"
+                    background: true
 
         host2:
             ifaces:

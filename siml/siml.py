@@ -7,6 +7,7 @@ from netns.veth import Veth
 from netns.vlan import Vlan
 from netns.bridge import Bridge
 from netns.nat import NAT
+from netns.command import Command
 from pyroute2 import netns
 from pyroute2 import NetNS, IPDB
 
@@ -24,6 +25,7 @@ class Siml():
         self.interfaces_name = []
         self.routes = []
         self.nat_list = []
+        self.command_list = []
 
         if "host" in config[self.name].keys():
             self.load_host(config[self.name]["host"])
@@ -68,6 +70,14 @@ class Siml():
             self.nat_list.append(nat)
             # nat.create()
 
+        # command execute in specified netns
+        if "commands" in config:
+            commands = config["commands"]
+            for command in commands:
+                cmd = Command(command["command"]["name"], ns_name=ns_name, background=command["command"]["background"])
+                self.command_list.append(cmd)
+
+
 
     def create(self):
         mkdir_tmp()
@@ -99,6 +109,7 @@ class Siml():
         self.set_bridge()
         self.set_addr()
         self.up()
+        self.exec_cmd()
 
     def up(self):
         for iface in self.interfaces:
@@ -152,8 +163,10 @@ class Siml():
             if iface.type == InterfaceType.bridge:
                 iface.set_if()
 
-    # def output_state(self, path):
-        
+    def exec_cmd(self):
+        for cmd in self.command_list:
+            cmd.exec()
+    
 
 def enable_ipv4_forward():
     ip_forward_path = "/proc/sys/net/ipv4/ip_forward"

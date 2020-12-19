@@ -37,7 +37,7 @@ class NetNs():
         with ipdb.interfaces["lo"] as lo:
             lo.add_ip("127.0.0.1/8")
             lo.up()
-
+        
     def run(self):
         self.ns = NetNS(self.name)
         print("[info] Created Network Namespace %s" % self.name)
@@ -60,7 +60,6 @@ class NetNs():
             if iface.name == ifname:
                 return True
         return False
-
 
     def register_netns_id(self):
         # command = ['/proc/self/exe', os.Args[0], 'register_netns_id', self.name]
