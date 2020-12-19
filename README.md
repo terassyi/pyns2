@@ -56,16 +56,47 @@ example-network-container:
 Other exampele is located in `examples/`
 
 ## format
-
-
+  
 ## command
+- `create <file>`
+  
+  This command create netns and interface.
+
+- `set <file>`
+
+  This command set created interfaces in netns
+
 - `run <file>`
   
-  This command cretes virtual network from config file.
+  This command run virtual network from config file. This command is equal to `create` and `set`
 - `delete <file>`
   
   This command deletes virtual network created by run command
 - `exec <netns name> <command>`
   This command executes the command(default is `bash`) in the target network namespace.
+  
+  *Note: if you want to execute the command contains space(exp: ping 8.8.8.8) <command>, you have to write as list object like ['ping', '8.8.8.8']*
 
-## 
+- `up <file>`
+
+  This command up created interfaces
+
+- `down <file>`
+
+  This command down creted interfaces
+
+- `list <file>`
+
+  This command shows created netns
+
+- `validate <file>`
+
+  This command checks whether config file valid
+
+- `check_netns`
+
+  This command output current netns name 
+
+## Future work
+- implement monitoring modules
+- add supports of other interface types
