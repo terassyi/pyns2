@@ -1,5 +1,7 @@
 # pyns2
 pyns2(renamed from netns-siml) is network simulator with linux network namespace create virtual network by yaml format config file.
+
+[Blog post(Japanese)](https://terassyi.net/posts/2020/12/21/pyns2.html)
 ## support
 ### interface type
 Now `veth` and `bridge` type interface is supported.
@@ -8,6 +10,48 @@ Now `veth` and `bridge` type interface is supported.
 This tool works on Linux and need root access.
 To quick use, please you can use `Vagrant`.
 This also works on privileged docker container. But under docker for mac environment, external access(NAT) don't work.
+
+## quick start
+You can try pyns2 in two ways.
+
+### Vagrant
+If you try pyns2 with vagrant, you can use full function; an external network access and ebpf monitoring.
+1. clone this repository
+```shell
+$ git clone https://github.com/terassyi/pyns2.git
+$ cd pyns2
+```
+2. run vm and connect it
+```shell
+$ vagrant up
+$ vagrant ssh
+```
+3. run example
+```shell
+$ pyns2 run pyns2/example/example-container.yml
+```
+
+### Docker
+You can try pyns2 with docker easier than with vagrant, but functions is limited. It cannot access an external network(nat config) and use ebpf monitoring.
+1. clone this repository
+ ```shell
+$ git clone https://github.com/terassyi/pyns2.git
+$ cd pyns2
+```
+2. run container
+```shell
+$ docker-compose up -d
+```
+or
+```shell
+$ docker build -t pyns2 .
+$ docker run -it --privileged --name pyns2 pyns2
+```
+3. run example
+```shell
+$ pyns2 run pyns2/example/example.yml
+```
+
 ## example
 This is the example of network definition. This file is in `examples/example-container.yml`
 
