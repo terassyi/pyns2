@@ -2,10 +2,10 @@ import netaddr
 import os
 import time
 from enum import Enum
-from siml.error import SimlCreateException
-from siml.util import get_netns_id
-from netns.exec import start_process
-from netns.interface import Interface
+from pyns2.siml.error import SimlCreateException
+from pyns2.siml.util import get_netns_id
+from pyns2.netns.exec import start_process
+from pyns2.netns.interface import Interface
 from pyroute2 import IPRoute
 from pyroute2 import IPDB
 from pyroute2 import NetNS
@@ -42,10 +42,10 @@ class NetNs():
         self.ns = NetNS(self.name)
         print("[info] Created Network Namespace %s" % self.name)
         # up loopback interface
-        ipdb = IPDB(nl=self.ns)
-        with ipdb.interfaces["lo"] as lo:
-            lo.add_ip("127.0.0.1/8")
-            lo.up()
+        # ipdb = IPDB(nl=self.ns)
+        # with ipdb.interfaces["lo"] as lo:
+        #     lo.add_ip("127.0.0.1/8")
+        #     lo.up()
     
     def remove(self):
         netns.remove(self.name)
@@ -63,10 +63,8 @@ class NetNs():
 
 
     def register_netns_id(self):
-        # command = ['/proc/self/exe', os.Args[0], 'register_netns_id', self.name]
-        command = ['python3', 'main.py', 'register_netns_id', self.name]
-        # command = 'python3 ./main.py register_netns_id ' + self.name
-        # command = ['/usr/bin/python3', '-V']
+        # command = ['python3', 'main.py', 'register_netns_id', self.name]
+        command = ['bin/pyns2', 'register_netns_id', self.name]
         p = NSPopen(self.name, command,
             preexec_fn=os.setsid,
             universal_newlines=True)

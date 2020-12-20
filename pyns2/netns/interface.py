@@ -2,7 +2,8 @@ import netaddr
 from pyroute2 import IPDB, NetNS, NSPopen
 from enum import Enum
 
-class Interface():
+
+class Interface:
     def __init__(self, name: str, address: str = None, typ: str = None, peer: str = None, ns_name: str = None):
         self.type = interface_type_from_string(typ)
         if self.type == InterfaceType.veth:
@@ -18,12 +19,13 @@ class Interface():
         ipdb.create(kind=str(self.type), ifname=self.name, peer=self.peer_name).commit()
         self.set_addr()
         self.status = InterfaceStatus.down
-        print("[info] Created Network Interface name=%s address=%s in netns=%s" % (self.name, str(self.ip), self.ns_name))
+        print(
+            "[info] Created Network Interface name=%s address=%s in netns=%s" % (self.name, str(self.ip), self.ns_name))
 
     def create_veth(self):
         if is_exist_interface(self.name):
             return
-        
+
         ipdb = IPDB()
         ipdb.create(kind=str(self.type), ifname=self.name, peer=self.peer_name).commit()
 
@@ -35,7 +37,7 @@ class Interface():
         try:
             ipdb.interfaces[self.name]
         except KeyError:
-            return 
+            return
         with ipdb.interfaces[self.name] as iface:
             iface.net_ns_fd = self.ns_name
             print("[info] %s is set netns=%s" % (self.name, self.ns_name))
@@ -72,6 +74,7 @@ class Interface():
             iface.add_ip(str(self.ip))
             print("[info] set address=%s to %s" % (str(self.ip), self.name))
 
+
 class InterfaceType(Enum):
     veth = 0
     vlan = 1
@@ -87,6 +90,7 @@ class InterfaceType(Enum):
             return 'bridge'
         else:
             return ''
+
 
 def interface_type_from_string(typ: str):
     if typ == "veth":
@@ -106,7 +110,7 @@ class InterfaceStatus(Enum):
 
     def __init__(self, status: int):
         self = status
-    
+
     def __str__(self):
         if self == not_created:
             return "NOT_CREATED"
@@ -116,6 +120,7 @@ class InterfaceStatus(Enum):
             return "UP"
         else:
             return "UNKNOWN"
+
 
 def is_exist_interface(ifname: str, ns_name: str = None):
     ipdb = IPDB()

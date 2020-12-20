@@ -57,7 +57,7 @@ def tcp_info():
             event.net_ns))
 
     prog = ""
-    with open("./bpf_prog/tcp_info.c") as f:
+    with open("bpf_prog/tcp_info.c") as f:
         prog = f.read()
     b = BPF(text=prog)
 
