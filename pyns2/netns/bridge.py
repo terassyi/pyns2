@@ -1,4 +1,4 @@
-from netns.interface import Interface, InterfaceType, InterfaceStatus
+from pyns2.netns.interface import Interface, InterfaceType, InterfaceStatus
 import netaddr
 from pyroute2 import IPDB, NetNS
 

@@ -1,5 +1,5 @@
 import yaml
-from siml.siml import Siml
+from pyns2.siml.siml import Siml
 
 def parse(path: str):
     with open(path, 'r') as yml:
@@ -9,6 +9,6 @@ def parse(path: str):
 
 
 if __name__ == '__main__':
-    s = parse("../examples/example.yml")
+    s = parse("../../examples/example.yml")
     print(s.netns[0])
 

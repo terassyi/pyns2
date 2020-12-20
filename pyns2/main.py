@@ -1,8 +1,8 @@
 # from parser.parser import parse
 import fire
-from parser.parser import parse
+from pyns2.parser.parser import parse
 from netns.exec import exec_command
-from siml.util import register_netns_id, get_netns_name
+from pyns2.siml.util import register_netns_id, get_netns_name
 
 class NetNsSiml(object):
 

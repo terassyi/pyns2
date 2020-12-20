@@ -1,16 +1,16 @@
-from siml.error import SimlCreateException
-from siml.util import *
-from netns.netns import NetNs
-from netns.interface import InterfaceType, interface_type_from_string
-from netns.route import Route
-from netns.veth import Veth
-from netns.vlan import Vlan
-from netns.bridge import Bridge
-from netns.nat import NAT
+from pyns2.siml.error import SimlCreateException
+from pyns2.siml.util import *
+from pyns2.netns.netns import NetNs
+from pyns2.netns.interface import InterfaceType, interface_type_from_string
+from pyns2.netns.route import Route
+from pyns2.netns.veth import Veth
+from pyns2.netns.vlan import Vlan
+from pyns2.netns.bridge import Bridge
+from pyns2.netns.nat import NAT
 from pyroute2 import netns
 from pyroute2 import NetNS, IPDB
 
-from siml.util import is_host_namespace
+from pyns2.siml.util import is_host_namespace
 
 
 class Siml():

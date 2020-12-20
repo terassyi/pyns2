@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+
+from pyns2.cli.main import main
+
+main()
