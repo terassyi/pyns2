@@ -64,7 +64,7 @@ class NetNs():
 
     def register_netns_id(self):
         # command = ['python3', 'main.py', 'register_netns_id', self.name]
-        command = ['bin/pyns2', 'register_netns_id', self.name]
+        command = ['pyns2', 'register_netns_id', self.name]
         p = NSPopen(self.name, command,
             preexec_fn=os.setsid,
             universal_newlines=True)

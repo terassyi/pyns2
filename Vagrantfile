@@ -15,8 +15,11 @@ Vagrant.configure("2") do |config|
     vb.memory = 1024 
   end
   config.vm.provision "file", source: "./requirements.txt", destination: "/tmp/requirements.txt"
+#   config.vm.provision "file", source: "./bin/pyns2", destination: "/tmp/pyns2"
+#   config.vm.provision "shell", inline: "mv /tmp/pyns2 /usr/local/bin/pyns2"
+
+  config.vm.synced_folder "./", "/home/vagrant/pyns2"
   config.vm.provision :shell, :privileged => true, :path => "setup.sh"
-  config.vm.synced_folder "./", "/home/vagrant/work"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
