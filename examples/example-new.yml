@@ -1,0 +1,62 @@
+example-new:
+  host:
+    ifaces:
+      br0:
+        type: bridge
+        address: 192.168.1.1/24
+        ifaces:
+          - host.veth0
+          - host.veth1
+          - host.veth2
+      veth0:
+        type: veth
+        peer: host0.veth0
+      veth1:
+        type: veth
+        peer: host1.veth1
+      veth2:
+        type: veth
+        peer: host2.veth2
+    nat:
+      src: 192.168.1.0/24
+      out: eth0
+
+  netns:
+    host0:
+      ifaces:
+        veth0:
+          type: veth
+          address: 192.168.1.2/24
+          peer: host.veth0
+        veth1:
+          type: veth
+          address: 192.168.2.2/24
+          peer: host1.veth1
+      routes:
+        - route:
+            gateway: "192.168.1.1"
+            dst: default
+    host1:
+      ifaces:
+        veth0:
+          type: veth
+          address: 192.168.1.3/24
+          peer: host.veth1
+        veth1:
+          type: veth
+          address: 192.168.2.3/24
+          peer: host0.veth1
+      routes:
+        - route:
+            gateway: "192.168.1.1"
+            dst: default
+    host2:
+      ifaces:
+        veth0:
+          type: veth
+          address: 192.168.1.4/24
+          peer: host.veth2
+      routes:
+        - route:
+            gateway: "192.168.1.1"
+            dst: default

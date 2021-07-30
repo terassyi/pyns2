@@ -1,13 +1,13 @@
 #! /bin/bash
 
-sudo apt update -y
-sudo apt install -y python3-pip traceroute
+apt update -y
+apt install -y python3-pip traceroute
 
-sudo pip3 install -r /tmp/requirements.txt
+pip3 install -r /tmp/requirements.txt
 
-sudo pip3 install -e /home/vagrant/pyns2
+pip3 install -e /home/pyns2
 
-sudo cp /home/vagrant/pyns2/bin/pyns2 /usr/local/bin/pyns2
+cp /home/pyns2/bin/pyns2 /usr/bin/pyns2
 
 # bpf
 #sudo apt install -y bison build-essential cmake flex git libedit-dev \

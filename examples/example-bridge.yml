@@ -1,29 +1,29 @@
 example-network-bridge:
-    host:
-        ifaces:
-            br0:
-                type: "bridge"
-                ifaces:
-                    - "veth1-br"
-                    - "veth2-br"
-                    - "veth0-br"
-            
-            host-veth0:
-                type: "veth"
-                address: "10.0.0.1/24"
-                peer: "veth0-br"
+  host:
+    ifaces:
+      br0:
+          type: "bridge"
+          ifaces:
+              - "veth1-br"
+              - "veth2-br"
+              - "veth0-br"
+      
+      host-veth0:
+          type: "veth"
+          address: "10.0.0.1/24"
+          peer: "veth0-br"
 
-    netns:
-        host1:
-            ifaces:
-                host1-veth1:
-                    type: "veth"
-                    address: "10.0.0.2/24"
-                    peer: "veth1-br"
+  netns:
+      host1:
+          ifaces:
+              host1-veth1:
+                  type: "veth"
+                  address: "10.0.0.2/24"
+                  peer: "veth1-br"
 
-        host2:
-            ifaces:
-                host2-veth1:
-                    type: "veth"
-                    address: "10.0.0.3/24"
-                    peer: "veth2-br"
+      host2:
+          ifaces:
+              host2-veth1:
+                  type: "veth"
+                  address: "10.0.0.3/24"
+                  peer: "veth2-br"
