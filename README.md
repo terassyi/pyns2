@@ -32,7 +32,7 @@ $ pyns2 run pyns2/example/example-container.yml
 ```
 
 ### Docker
-You can try pyns2 with docker easier than with vagrant, but functions is limited. It cannot access an external network(nat config) and use ebpf monitoring.
+You can try pyns2 with docker easier than with vagrant, but features are limited. 
 1. clone this repository
  ```shell
 $ git clone https://github.com/terassyi/pyns2.git
@@ -40,12 +40,8 @@ $ cd pyns2
 ```
 2. run container
 ```shell
-$ docker-compose up -d
-```
-or
-```shell
 $ docker build -t pyns2 .
-$ docker run -it --privileged --name pyns2 pyns2
+$ docker run -it --privileged --name pyns2 bash
 ```
 3. run example
 ```shell
